@@ -2,190 +2,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import levy_stable
 from matplotlib.animation import FuncAnimation
-
-class CityData:
-    def __init__(self):
-        self.city_names = [
-            'Tunis', 'Sfax', 'Sousse', 'Kairouan', 'Bizerte', 
-            'Gabès', 'Ariana', 'Gafsa', 'La Marsa', 'Menzel Bourguiba',
-            'Monastir', 'Mahdia', 'Tozeur', 'Kebili', 'Zarzis'
-        ]
-        self.cities = np.array([
-            [10.1815, 36.8065],  # Tunis
-            [10.7603, 34.7406],  # Sfax
-            [10.6346, 35.8245],  # Sousse
-            [10.1017, 35.6781],  # Kairouan
-            [9.8739, 37.2744],   # Bizerte
-            [10.0982, 33.8815],  # Gabès
-            [10.1934, 36.8601],  # Ariana
-            [8.7842, 34.4250],   # Gafsa
-            [10.3300, 36.8782],  # La Marsa
-            [9.7844, 37.1537],   # Menzel Bourguiba
-            [10.8113, 35.7771],  # Monastir
-            [11.0457, 35.5047],  # Mahdia
-            [8.1335, 33.9197],   # Tozeur
-            [8.7114, 33.7044],   # Kebili
-            [11.1122, 33.5032]   # Zarzis
-        ])
-        self.dist_matrix = np.array([
-            # Tunis, Sfax, Sousse, Kairouan, Bizerte, Gabès, Ariana, Gafsa, La Marsa, Menzel Bourguiba, Monastir, Mahdia, Tozeur, Kebili, Zarzis
-            [0, 270, 140, 160, 70, 400, 10, 350, 15, 80, 170, 200, 450, 500, 520],  # Tunis
-            [270, 0, 130, 120, 300, 120, 280, 230, 285, 310, 140, 100, 320, 370, 390],  # Sfax
-            [140, 130, 0, 60, 210, 270, 150, 300, 155, 220, 50, 90, 360, 410, 430],  # Sousse
-            [160, 120, 60, 0, 230, 250, 170, 280, 175, 240, 70, 110, 340, 390, 410],  # Kairouan
-            [70, 300, 210, 230, 0, 470, 80, 420, 85, 50, 240, 270, 500, 550, 570],  # Bizerte
-            [400, 120, 270, 250, 470, 0, 410, 150, 415, 440, 290, 250, 200, 150, 170],  # Gabès
-            [10, 280, 150, 170, 80, 410, 0, 360, 5, 90, 180, 210, 460, 510, 530],  # Ariana
-            [350, 230, 300, 280, 420, 150, 360, 0, 365, 390, 340, 300, 50, 100, 120],  # Gafsa
-            [15, 285, 155, 175, 85, 415, 5, 365, 0, 95, 185, 215, 465, 515, 535],  # La Marsa
-            [80, 310, 220, 240, 50, 440, 90, 390, 95, 0, 250, 280, 510, 560, 580],  # Menzel Bourguiba
-            [170, 140, 50, 70, 240, 290, 180, 340, 185, 250, 0, 40, 380, 430, 450],  # Monastir
-            [200, 100, 90, 110, 270, 250, 210, 300, 215, 280, 40, 0, 360, 410, 430],  # Mahdia
-            [450, 320, 360, 340, 500, 200, 460, 50, 465, 510, 380, 360, 0, 50, 70],  # Tozeur
-            [500, 370, 410, 390, 550, 150, 510, 100, 515, 560, 430, 410, 50, 0, 40],  # Kebili
-            [520, 390, 430, 410, 570, 170, 530, 120, 535, 580, 450, 430, 70, 40, 0],  # Zarzis
-        ])
-
-class FlowerPollinationAlgorithm:
-    def __init__(self, city_data, population_size=20, n_iterations=100, switch_prob=0.8, gamma=0.1, lambda_=1.5):
-        self.city_data = city_data
-        self.population_size = population_size
-        self.n_iterations = n_iterations
-        self.switch_prob = switch_prob
-        self.gamma = gamma
-        self.lambda_ = lambda_
-        self.population = np.random.rand(population_size, len(city_data.city_names))
-        self.best_solution = self.population[0].copy()
-        self.best_permutation = self.vector_to_permutation(self.best_solution)
-        self.best_distance = self.total_distance(self.best_permutation)
-        self.history = []
-
-    def vector_to_permutation(self, vector):
-        return np.argsort(vector)
-
-    def total_distance(self, permutation):
-        distance = 0
-        for i in range(len(permutation) - 1):
-            distance += self.city_data.dist_matrix[permutation[i], permutation[i + 1]]
-        distance += self.city_data.dist_matrix[permutation[-1], permutation[0]]  # Return to start
-        return distance
-
-    def optimize(self):
-        for _ in range(self.n_iterations):
-            for i in range(self.population_size):
-                if np.random.rand() < self.switch_prob:
-                    step = levy_stable.rvs(alpha=self.lambda_, beta=0, loc=0, scale=self.gamma, size=len(self.city_data.city_names))
-                    new_solution = self.population[i] + step * (self.best_solution - self.population[i])
-                else:
-                    epsilon = np.random.rand()
-                    j, k = np.random.choice(self.population_size, 2, replace=False)
-                    new_solution = self.population[i] + epsilon * (self.population[j] - self.population[k])
-                
-                new_solution = np.clip(new_solution, 0, 1)
-                new_permutation = self.vector_to_permutation(new_solution)
-                new_distance = self.total_distance(new_permutation)
-
-                if new_distance < self.best_distance:
-                    self.best_solution = new_solution.copy()
-                    self.best_permutation = new_permutation
-                    self.best_distance = new_distance
-            
-            self.history.append(self.best_permutation.copy())
-
-    def animate(self):
-        fig, ax = plt.subplots(figsize=(8, 6))
-
-        def update(frame):
-            ax.clear()
-            perm = self.history[frame]
-            route = np.append(perm, perm[0])
-            ax.scatter(self.city_data.cities[:, 0], self.city_data.cities[:, 1], c='red', s=100, zorder=5, label='Cities')
-            for i, (x, y) in enumerate(self.city_data.cities):
-                ax.text(x, y, f' {self.city_data.city_names[i]}', fontsize=8, ha='right', zorder=10)
-            ax.plot(self.city_data.cities[route, 0], self.city_data.cities[route, 1], 'b-', lw=2, alpha=0.7, label='Route')
-            ax.set_title(f'Iteration: {frame + 1}\nDistance: {self.total_distance(perm):.0f} km', fontsize=12)  # Fixed format specifier
-            ax.set_xlabel('Longitude (°E)', fontsize=10)
-            ax.set_ylabel('Latitude (°N)', fontsize=10)
-            ax.set_xlim(np.min(self.city_data.cities[:, 0]) - 0.5, np.max(self.city_data.cities[:, 0]) + 0.5)
-            ax.set_ylim(np.min(self.city_data.cities[:, 1]) - 0.5, np.max(self.city_data.cities[:, 1]) + 0.5)
-            ax.set_aspect('equal')
-            ax.legend(loc='upper right', fontsize=9)
-
-        ani = FuncAnimation(fig, update, frames=len(self.history), repeat=False)
-        # Removed plt.show() to avoid warning in Streamlit
-        ani.save('fpa_animation.gif', writer='pillow', fps=5)  # Changed writer to 'pillow'
-
-class SimulatedAnnealing:
-    def __init__(self, city_data, initial_temp=1000, cooling_rate=0.9, min_temp=10):  # Adjusted cooling_rate and min_temp
-        self.city_data = city_data
-        self.initial_temp = initial_temp
-        self.cooling_rate = cooling_rate
-        self.min_temp = min_temp
-        self.current_solution = np.random.permutation(len(city_data.city_names))
-        self.current_distance = self.total_distance(self.current_solution)
-        self.best_solution = self.current_solution.copy()
-        self.best_distance = self.current_distance
-        self.history = []
-
-    def total_distance(self, permutation):
-        distance = 0
-        for i in range(len(permutation) - 1):
-            distance += self.city_data.dist_matrix[permutation[i], permutation[i + 1]]
-        distance += self.city_data.dist_matrix[permutation[-1], permutation[0]]  # Return to start
-        return distance
-
-    def swap_cities(self, solution):
-        new_solution = solution.copy()
-        i, j = np.random.choice(len(solution), 2, replace=False)
-        new_solution[i], new_solution[j] = new_solution[j], new_solution[i]
-        return new_solution
-
-    def optimize(self):
-        temp = self.initial_temp
-        iteration = 0
-        while temp > self.min_temp and iteration < 100:  # Limit iterations to 100
-            new_solution = self.swap_cities(self.current_solution)
-            new_distance = self.total_distance(new_solution)
-            delta = new_distance - self.current_distance
-
-            if delta < 0 or np.random.rand() < np.exp(-delta / temp):
-                self.current_solution = new_solution
-                self.current_distance = new_distance
-
-                if new_distance < self.best_distance:
-                    self.best_solution = new_solution
-                    self.best_distance = new_distance
-
-            self.history.append(self.best_solution.copy())
-            temp *= self.cooling_rate
-            iteration += 1  # Increment iteration count
-
-    def visualize(self):
-        best_route = np.append(self.best_solution, self.best_solution[0])
-        plt.figure(figsize=(8, 6))
-        plt.scatter(self.city_data.cities[:, 0], self.city_data.cities[:, 1], c='red', s=100, zorder=5, label='Cities')
-        for i, (x, y) in enumerate(self.city_data.cities):
-            plt.text(x, y, f' {self.city_data.city_names[i]}', fontsize=8, ha='right', zorder=10)
-        plt.plot(self.city_data.cities[best_route, 0], self.city_data.cities[best_route, 1], 'b-', lw=2, alpha=0.7, label='Route')
-        plt.title(f'Simulated Annealing Solution\nDistance: {self.best_distance:.0f} km', fontsize=12)
-        plt.xlabel('Longitude (°E)', fontsize=10)
-        plt.ylabel('Latitude (°N)', fontsize=10)
-        plt.xlim(np.min(self.city_data.cities[:, 0]) - 0.5, np.max(self.city_data.cities[:, 0]) + 0.5)
-        plt.ylim(np.min(self.city_data.cities[:, 1]) - 0.5, np.max(self.city_data.cities[:, 1]) + 0.5)
-        plt.gca().set_aspect('equal')
-        plt.legend(loc='upper right', fontsize=9)
-        plt.tight_layout()
-        plt.show()
+from algorithms import CityData  # Import CityData from algorithms.py
+from algorithms import FlowerPollinationAlgorithm, SimulatedAnnealing  # Import algorithms from algorithms.py
+from algorithms import GeneticAlgorithm  # Import GeneticAlgorithm from algorithms.py
 
 class ComparisonVisualization:
-    def __init__(self, city_data, fpa, sa):
+    def __init__(self, city_data, fpa, sa, ga):
         self.city_data = city_data
         self.fpa = fpa
         self.sa = sa
-        self.fig, self.axes = plt.subplots(1, 2, figsize=(16, 8))
+        self.ga = ga
+        self.fig, self.axes = plt.subplots(1, 3, figsize=(24, 8))  # Add a third subplot for GA
         self.fpa_frames = len(fpa.history)
         self.sa_frames = len(sa.history)
-        self.max_frames = max(self.fpa_frames, self.sa_frames)
+        self.ga_frames = len(ga.history)
+        self.max_frames = max(self.fpa_frames, self.sa_frames, self.ga_frames)
 
     def update(self, frame):
         for ax in self.axes:
@@ -198,7 +29,7 @@ class ComparisonVisualization:
             ax = self.axes[0]
             ax.scatter(self.city_data.cities[:, 0], self.city_data.cities[:, 1], c='red', s=100, zorder=5, label='Cities')
             for i, (x, y) in enumerate(self.city_data.cities):
-                ax.text(x, y, f' {self.city_data.city_names[i]}', fontsize=8, ha='right', zorder=10)
+                ax.text(x, y, f' {self.city_data.city_names[i]} ({np.where(perm == i)[0][0] + 1})', fontsize=8, ha='right', zorder=10)
             ax.plot(self.city_data.cities[route, 0], self.city_data.cities[route, 1], 'b-', lw=2, alpha=0.7, label='Route')
             ax.set_title(f'FPA Iteration: {frame + 1}\nDistance: {self.fpa.total_distance(perm):.0f} km', fontsize=12)  # Fixed format specifier
             ax.set_xlabel('Longitude (°E)', fontsize=10)
@@ -215,9 +46,26 @@ class ComparisonVisualization:
             ax = self.axes[1]
             ax.scatter(self.city_data.cities[:, 0], self.city_data.cities[:, 1], c='red', s=100, zorder=5, label='Cities')
             for i, (x, y) in enumerate(self.city_data.cities):
-                ax.text(x, y, f' {self.city_data.city_names[i]}', fontsize=8, ha='right', zorder=10)
+                ax.text(x, y, f' {self.city_data.city_names[i]} ({np.where(perm == i)[0][0] + 1})', fontsize=8, ha='right', zorder=10)
             ax.plot(self.city_data.cities[route, 0], self.city_data.cities[route, 1], 'b-', lw=2, alpha=0.7, label='Route')
             ax.set_title(f'SA Iteration: {frame + 1}\nDistance: {self.sa.total_distance(perm):.0f} km', fontsize=12)  # Fixed format specifier
+            ax.set_xlabel('Longitude (°E)', fontsize=10)
+            ax.set_ylabel('Latitude (°N)', fontsize=10)
+            ax.set_xlim(np.min(self.city_data.cities[:, 0]) - 0.5, np.max(self.city_data.cities[:, 0]) + 0.5)
+            ax.set_ylim(np.min(self.city_data.cities[:, 1]) - 0.5, np.max(self.city_data.cities[:, 1]) + 0.5)
+            ax.set_aspect('equal')
+            ax.legend(loc='upper right', fontsize=9)
+
+        # Update GA plot
+        if frame < self.ga_frames:
+            perm = self.ga.history[frame]
+            route = np.append(perm, perm[0])
+            ax = self.axes[2]
+            ax.scatter(self.city_data.cities[:, 0], self.city_data.cities[:, 1], c='red', s=100, zorder=5, label='Cities')
+            for i, (x, y) in enumerate(self.city_data.cities):
+                ax.text(x, y, f' {self.city_data.city_names[i]} ({np.where(perm == i)[0][0] + 1})', fontsize=8, ha='right', zorder=10)
+            ax.plot(self.city_data.cities[route, 0], self.city_data.cities[route, 1], 'b-', lw=2, alpha=0.7, label='Route')
+            ax.set_title(f'GA Generation: {frame + 1}\nDistance: {self.ga.total_distance(perm):.0f} km', fontsize=12)
             ax.set_xlabel('Longitude (°E)', fontsize=10)
             ax.set_ylabel('Latitude (°N)', fontsize=10)
             ax.set_xlim(np.min(self.city_data.cities[:, 0]) - 0.5, np.max(self.city_data.cities[:, 0]) + 0.5)
@@ -234,13 +82,17 @@ class ComparisonVisualization:
 city_data = CityData()
 
 # Solve using Flower Pollination Algorithm
-fpa = FlowerPollinationAlgorithm(city_data)
-fpa.optimize()
+fpa = FlowerPollinationAlgorithm(city_data)  # Imported from algorithms.py
+fpa.optimize()  # Runs the FPA algorithm for 100 iterations (default value)
 
 # Solve using Simulated Annealing
-sa = SimulatedAnnealing(city_data)
-sa.optimize()
+sa = SimulatedAnnealing(city_data)  # Imported from algorithms.py
+sa.optimize()  # Runs the SA algorithm for 100 iterations (default value)
 
-# Visualize both algorithms side by side
-comparison = ComparisonVisualization(city_data, fpa, sa)
+# Solve using Genetic Algorithm
+ga = GeneticAlgorithm(city_data)
+ga.optimize()
+
+# Visualize all three algorithms side by side
+comparison = ComparisonVisualization(city_data, fpa, sa, ga)
 comparison.animate()

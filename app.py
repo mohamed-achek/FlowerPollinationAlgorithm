@@ -123,7 +123,7 @@ def create_map(city_data, route):
 
     return m
 
-tab1, tab2 = st.tabs(["Run Algorithms", "Compare Results"])
+tab1, tab2, tab3 = st.tabs(["Run Algorithms", "Compare Results", "Sensitivity Analysis"])
 
 with tab1:
     # Sidebar for algorithm selection
@@ -412,6 +412,83 @@ with tab2:
         ax.legend()
         ax.grid(True)
         st.pyplot(fig)
+
+with tab3:
+    st.write("### Sensitivity Analysis")
+    algorithm = st.selectbox("Select Algorithm:", ["Flower Pollination Algorithm", "Simulated Annealing", "Genetic Algorithm"])
+
+    if algorithm == "Flower Pollination Algorithm":
+        switch_prob = st.slider("Switch Probability:", 0.1, 1.0, 0.8, 0.1)
+        gamma = st.slider("Gamma:", 0.01, 1.0, 0.1, 0.01)
+        lambda_ = st.slider("Lambda:", 0.1, 2.0, 1.5, 0.1)
+        runs = st.number_input("Number of Runs:", min_value=1, max_value=50, value=10, step=1)
+
+        if st.button("Run Sensitivity Analysis"):
+            results = []
+            for prob in np.linspace(0.1, 1.0, 10):  # Example: Vary switch_prob
+                fpa = FlowerPollinationAlgorithm(city_data, switch_prob=prob, gamma=gamma, lambda_=lambda_)
+                fpa.optimize()
+                results.append({"Switch Prob": prob, "Best Distance": fpa.best_distance, "Execution Time": fpa.n_iterations})
+
+            st.write("### Results")
+            st.table(results)
+
+            # Plot sensitivity
+            distances = [r["Best Distance"] for r in results]
+            probs = [r["Switch Prob"] for r in results]
+            plt.plot(probs, distances, marker="o")
+            plt.title("Sensitivity of FPA to Switch Probability")
+            plt.xlabel("Switch Probability")
+            plt.ylabel("Best Distance")
+            st.pyplot(plt)
+
+    elif algorithm == "Simulated Annealing":
+        initial_temp = st.slider("Initial Temperature:", 100, 2000, 1000, 100)
+        cooling_rate = st.slider("Cooling Rate:", 0.5, 0.99, 0.9, 0.01)
+        runs = st.number_input("Number of Runs:", min_value=1, max_value=50, value=10, step=1)
+
+        if st.button("Run Sensitivity Analysis"):
+            results = []
+            for rate in np.linspace(0.5, 0.99, 10):  # Example: Vary cooling_rate
+                sa = SimulatedAnnealing(city_data, initial_temp=initial_temp, cooling_rate=rate)
+                sa.optimize()
+                results.append({"Cooling Rate": rate, "Best Distance": sa.best_distance, "Execution Time": sa.n_iterations})
+
+            st.write("### Results")
+            st.table(results)
+
+            # Plot sensitivity
+            distances = [r["Best Distance"] for r in results]
+            rates = [r["Cooling Rate"] for r in results]
+            plt.plot(rates, distances, marker="o")
+            plt.title("Sensitivity of SA to Cooling Rate")
+            plt.xlabel("Cooling Rate")
+            plt.ylabel("Best Distance")
+            st.pyplot(plt)
+
+    elif algorithm == "Genetic Algorithm":
+        population_size = st.slider("Population Size:", 10, 200, 50, 10)
+        mutation_rate = st.slider("Mutation Rate:", 0.01, 0.5, 0.1, 0.01)
+        runs = st.number_input("Number of Runs:", min_value=1, max_value=50, value=10, step=1)
+
+        if st.button("Run Sensitivity Analysis"):
+            results = []
+            for rate in np.linspace(0.01, 0.5, 10):  # Example: Vary mutation_rate
+                ga = GeneticAlgorithm(city_data, population_size=population_size, mutation_rate=rate)
+                ga.optimize()
+                results.append({"Mutation Rate": rate, "Best Distance": ga.best_distance, "Execution Time": ga.n_generations})
+
+            st.write("### Results")
+            st.table(results)
+
+            # Plot sensitivity
+            distances = [r["Best Distance"] for r in results]
+            rates = [r["Mutation Rate"] for r in results]
+            plt.plot(rates, distances, marker="o")
+            plt.title("Sensitivity of GA to Mutation Rate")
+            plt.xlabel("Mutation Rate")
+            plt.ylabel("Best Distance")
+            st.pyplot(plt)
 
 
 

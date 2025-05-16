@@ -9,7 +9,8 @@ class CityData:
             'Tunis', 'Sfax', 'Sousse', 'Kairouan', 'Bizerte', 
             'Gabès', 'Ariana', 'Gafsa', 'La Marsa', 'Menzel Bourguiba',
             'Monastir', 'Mahdia', 'Tozeur', 'Kebili', 'Zarzis',
-            'Nabeul', 'Beja', 'Jendouba', 'Siliana', 'Tataouine'
+            'Nabeul', 'Beja', 'Jendouba', 'Siliana', 'Tataouine',
+            'Ben Arous', 'Manouba', 'Moknine', 'Metlaoui', 'Douz'
         ]
         self.cities = np.array([
             [10.1815, 36.8065],  # Tunis
@@ -31,31 +32,22 @@ class CityData:
             [9.1833, 36.7333],   # Beja
             [8.7833, 36.5000],   # Jendouba
             [9.3700, 36.0833],   # Siliana
-            [10.4500, 32.9333]   # Tataouine
+            [10.4500, 32.9333],  # Tataouine
+            [10.2320, 36.7538],  # Ben Arous (placeholder)
+            [10.1012, 36.8081],  # Manouba (placeholder)
+            [10.9900, 35.2500],  # Moknine (placeholder)
+            [8.4000, 34.3200],   # Metlaoui (placeholder)
+            [9.0167, 33.4500]    # Douz (placeholder)
         ])
-        self.dist_matrix = np.array([
-            # Tunis, Sfax, Sousse, Kairouan, Bizerte, Gabès, Ariana, Gafsa, La Marsa, Menzel Bourguiba, Monastir, Mahdia, Tozeur, Kebili, Zarzis, Nabeul, Beja, Jendouba, Siliana, Tataouine
-            [0, 270, 140, 160, 70, 400, 10, 350, 15, 80, 170, 200, 450, 500, 520, 60, 100, 150, 180, 600],  # Tunis
-            [270, 0, 130, 120, 300, 120, 280, 230, 285, 310, 140, 100, 320, 370, 390, 250, 320, 350, 300, 200],  # Sfax
-            [140, 130, 0, 60, 210, 270, 150, 300, 155, 220, 50, 90, 360, 410, 430, 100, 200, 250, 220, 350],  # Sousse
-            [160, 120, 60, 0, 230, 250, 170, 280, 175, 240, 70, 110, 340, 390, 410, 120, 220, 270, 240, 330],  # Kairouan
-            [70, 300, 210, 230, 0, 470, 80, 420, 85, 50, 240, 270, 500, 550, 570, 90, 50, 100, 150, 650],  # Bizerte
-            [400, 120, 270, 250, 470, 0, 410, 150, 415, 440, 290, 250, 200, 150, 170, 350, 400, 450, 400, 100],  # Gabès
-            [10, 280, 150, 170, 80, 410, 0, 360, 5, 90, 180, 210, 460, 510, 530, 70, 110, 160, 190, 610],  # Ariana
-            [350, 230, 300, 280, 420, 150, 360, 0, 365, 390, 340, 300, 50, 100, 120, 320, 370, 420, 370, 150],  # Gafsa
-            [15, 285, 155, 175, 85, 415, 5, 365, 0, 95, 185, 215, 465, 515, 535, 75, 115, 165, 195, 615],  # La Marsa
-            [80, 310, 220, 240, 50, 440, 90, 390, 95, 0, 250, 280, 510, 560, 580, 100, 60, 110, 160, 660],  # Menzel Bourguiba
-            [170, 140, 50, 70, 240, 290, 180, 340, 185, 250, 0, 40, 380, 430, 450, 150, 250, 300, 270, 380],  # Monastir
-            [200, 100, 90, 110, 270, 250, 210, 300, 215, 280, 40, 0, 360, 410, 430, 180, 280, 330, 300, 360],  # Mahdia
-            [450, 320, 360, 340, 500, 200, 460, 50, 465, 510, 380, 360, 0, 50, 70, 420, 470, 520, 470, 200],  # Tozeur
-            [500, 370, 410, 390, 550, 150, 510, 100, 515, 560, 430, 410, 50, 0, 40, 470, 520, 570, 520, 150],  # Kebili
-            [520, 390, 430, 410, 570, 170, 530, 120, 535, 580, 450, 430, 70, 40, 0, 490, 540, 590, 540, 170],  # Zarzis
-            [60, 250, 100, 120, 90, 350, 70, 320, 75, 100, 150, 180, 420, 470, 490, 0, 120, 170, 140, 550],  # Nabeul
-            [100, 320, 200, 220, 50, 400, 110, 370, 115, 60, 250, 280, 470, 520, 540, 120, 0, 80, 100, 600],  # Beja
-            [150, 350, 250, 270, 100, 450, 160, 420, 165, 110, 300, 330, 520, 570, 590, 170, 80, 0, 120, 650],  # Jendouba
-            [180, 300, 220, 240, 150, 400, 190, 370, 195, 160, 270, 300, 470, 520, 540, 140, 100, 120, 0, 600],  # Siliana
-            [600, 200, 350, 330, 650, 100, 610, 150, 615, 660, 380, 360, 200, 150, 170, 550, 600, 650, 600, 0],  # Tataouine
-        ])
+        # Compute symmetric distance matrix using Euclidean distance and scale to km
+        n = len(self.cities)
+        self.distance_matrix = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                if i != j:
+                    dx = self.cities[i][0] - self.cities[j][0]
+                    dy = self.cities[i][1] - self.cities[j][1]
+                    self.distance_matrix[i, j] = np.sqrt(dx**2 + dy**2) * 111  # Approximate km
 
 class FlowerPollinationAlgorithm:
     def __init__(self, city_data, 
@@ -82,8 +74,8 @@ class FlowerPollinationAlgorithm:
     def total_distance(self, permutation):
         distance = 0
         for i in range(len(permutation) - 1):
-            distance += self.city_data.dist_matrix[permutation[i], permutation[i + 1]]
-        distance += self.city_data.dist_matrix[permutation[-1], permutation[0]]  # Return to start
+            distance += self.city_data.distance_matrix[permutation[i], permutation[i + 1]]
+        distance += self.city_data.distance_matrix[permutation[-1], permutation[0]]  # Return to start
         return distance
 
     def optimize(self):
@@ -130,15 +122,16 @@ class FlowerPollinationAlgorithm:
 
 class SimulatedAnnealing:
     def __init__(self, city_data, 
-                
                 initial_temp=1000, 
                 cooling_rate=0.9, 
-                min_temp=10):  
+                min_temp=10, 
+                max_iterations=100):  
         
         self.city_data = city_data
         self.initial_temp = initial_temp
         self.cooling_rate = cooling_rate
         self.min_temp = min_temp
+        self.max_iterations = max_iterations
         self.current_solution = np.random.permutation(len(city_data.city_names))
         self.current_distance = self.total_distance(self.current_solution)
         self.best_solution = self.current_solution.copy()
@@ -148,8 +141,8 @@ class SimulatedAnnealing:
     def total_distance(self, permutation):
         distance = 0
         for i in range(len(permutation) - 1):
-            distance += self.city_data.dist_matrix[permutation[i], permutation[i + 1]]
-        distance += self.city_data.dist_matrix[permutation[-1], permutation[0]]  # Return to start
+            distance += self.city_data.distance_matrix[permutation[i], permutation[i + 1]]
+        distance += self.city_data.distance_matrix[permutation[-1], permutation[0]]  # Return to start
         return distance
 
     def swap_cities(self, solution):
@@ -158,10 +151,11 @@ class SimulatedAnnealing:
         new_solution[i], new_solution[j] = new_solution[j], new_solution[i]
         return new_solution
 
-    def optimize(self):
+    def optimize(self, max_iterations=None):
         temp = self.initial_temp
         iteration = 0
-        while temp > self.min_temp and iteration < 100:  # Limit iterations to 100
+        max_iter = max_iterations if max_iterations is not None else self.max_iterations
+        while temp > self.min_temp and iteration < max_iter:
             new_solution = self.swap_cities(self.current_solution)
             new_distance = self.total_distance(new_solution)
             delta = new_distance - self.current_distance
@@ -176,7 +170,7 @@ class SimulatedAnnealing:
 
             self.history.append(self.best_solution.copy())
             temp *= self.cooling_rate
-            iteration += 1  # Increment iteration count
+            iteration += 1
 
     def visualize(self):
         best_route = np.append(self.best_solution, self.best_solution[0])
@@ -202,55 +196,59 @@ class GeneticAlgorithm:
         self.n_generations = n_generations
         self.mutation_rate = mutation_rate
         self.population = [np.random.permutation(len(city_data.city_names)) for _ in range(population_size)]
-        self.fitness = [self.total_distance(ind) for ind in self.population]
-        self.best_solution = self.population[np.argmin(self.fitness)].copy()
-        self.best_distance = min(self.fitness)
+        self.best_solution = self.population[0]
+        self.best_distance = self.total_distance(self.best_solution)
         self.history = []
 
     def total_distance(self, permutation):
+        # Ensure the route starts and ends with Tunis (index 0)
+        permutation = [0] + [city for city in permutation if city != 0] + [0]
         distance = 0
         for i in range(len(permutation) - 1):
-            distance += self.city_data.dist_matrix[permutation[i], permutation[i + 1]]
-        distance += self.city_data.dist_matrix[permutation[-1], permutation[0]]
+            distance += self.city_data.distance_matrix[permutation[i], permutation[i + 1]]
         return distance
-
-    def select_parents(self):
-        idx = np.argsort(self.fitness)
-        return [self.population[idx[0]], self.population[idx[1]]]
 
     def crossover(self, parent1, parent2):
         size = len(parent1)
-        a, b = sorted(np.random.choice(range(size), 2, replace=False))
+        start, end = sorted(np.random.choice(range(size), 2, replace=False))
         child = [-1] * size
-        child[a:b] = parent1[a:b]
-        fill = [item for item in parent2 if item not in child]
-        idx = 0
-        for i in range(size):
-            if child[i] == -1:
-                child[i] = fill[idx]
-                idx += 1
+        child[start:end] = parent1[start:end]
+        pointer = 0
+        for gene in parent2:
+            if gene not in child:
+                while child[pointer] != -1:
+                    pointer += 1
+                child[pointer] = gene
         return np.array(child)
 
     def mutate(self, individual):
         if np.random.rand() < self.mutation_rate:
             i, j = np.random.choice(len(individual), 2, replace=False)
             individual[i], individual[j] = individual[j], individual[i]
-        return individual
 
     def optimize(self):
-        for _ in range(self.n_generations):
+        for generation in range(self.n_generations):
+            fitness = np.array([1 / self.total_distance(ind) for ind in self.population])
+            probabilities = fitness / fitness.sum()
             new_population = []
+            population_array = np.array(self.population)  # Convert population to a NumPy array
+
             for _ in range(self.population_size):
-                parent1, parent2 = self.select_parents()
+                parents_indices = np.random.choice(len(population_array), size=2, p=probabilities, replace=False)
+                parent1, parent2 = population_array[parents_indices[0]], population_array[parents_indices[1]]
                 child = self.crossover(parent1, parent2)
-                child = self.mutate(child)
+                self.mutate(child)
                 new_population.append(child)
+
             self.population = new_population
-            self.fitness = [self.total_distance(ind) for ind in self.population]
-            best_idx = np.argmin(self.fitness)
-            if self.fitness[best_idx] < self.best_distance:
-                self.best_solution = self.population[best_idx].copy()
-                self.best_distance = self.fitness[best_idx]
+
+            # Update the best solution
+            for individual in self.population:
+                distance = self.total_distance(individual)
+                if distance < self.best_distance:
+                    self.best_solution = individual
+                    self.best_distance = distance
+
             self.history.append(self.best_solution.copy())
 
 class ComparisonVisualization:

@@ -31,7 +31,7 @@ class ComparisonVisualization:
             for i, (x, y) in enumerate(self.city_data.cities):
                 ax.text(x, y, f' {self.city_data.city_names[i]} ({np.where(perm == i)[0][0] + 1})', fontsize=8, ha='right', zorder=10)
             ax.plot(self.city_data.cities[route, 0], self.city_data.cities[route, 1], 'b-', lw=2, alpha=0.7, label='Route')
-            ax.set_title(f'FPA Iteration: {frame + 1}\nDistance: {self.fpa.total_distance(perm):.0f} km', fontsize=12)  # Fixed format specifier
+            ax.set_title(f'FPA Iteration: {frame + 1}\nDistance: {self.fpa.total_distance(perm):.0f} km', fontsize=12)
             ax.set_xlabel('Longitude (°E)', fontsize=10)
             ax.set_ylabel('Latitude (°N)', fontsize=10)
             ax.set_xlim(np.min(self.city_data.cities[:, 0]) - 0.5, np.max(self.city_data.cities[:, 0]) + 0.5)
@@ -48,7 +48,7 @@ class ComparisonVisualization:
             for i, (x, y) in enumerate(self.city_data.cities):
                 ax.text(x, y, f' {self.city_data.city_names[i]} ({np.where(perm == i)[0][0] + 1})', fontsize=8, ha='right', zorder=10)
             ax.plot(self.city_data.cities[route, 0], self.city_data.cities[route, 1], 'b-', lw=2, alpha=0.7, label='Route')
-            ax.set_title(f'SA Iteration: {frame + 1}\nDistance: {self.sa.total_distance(perm):.0f} km', fontsize=12)  # Fixed format specifier
+            ax.set_title(f'SA Iteration: {frame + 1}\nDistance: {self.sa.total_distance(perm):.0f} km', fontsize=12)
             ax.set_xlabel('Longitude (°E)', fontsize=10)
             ax.set_ylabel('Latitude (°N)', fontsize=10)
             ax.set_xlim(np.min(self.city_data.cities[:, 0]) - 0.5, np.max(self.city_data.cities[:, 0]) + 0.5)
@@ -82,12 +82,12 @@ class ComparisonVisualization:
 city_data = CityData()
 
 # Solve using Flower Pollination Algorithm
-fpa = FlowerPollinationAlgorithm(city_data)  # Imported from algorithms.py
-fpa.optimize()  # Runs the FPA algorithm for 100 iterations (default value)
+fpa = FlowerPollinationAlgorithm(city_data)
+fpa.optimize()
 
 # Solve using Simulated Annealing
-sa = SimulatedAnnealing(city_data)  # Imported from algorithms.py
-sa.optimize()  # Runs the SA algorithm for 100 iterations (default value)
+sa = SimulatedAnnealing(city_data)
+sa.optimize()
 
 # Solve using Genetic Algorithm
 ga = GeneticAlgorithm(city_data)

@@ -11,6 +11,11 @@ Three algorithms are implemented and compared:
 - **Simulated Annealing (SA)**
 - **Genetic Algorithm (GA)**
 
+![Comparison Animation](comparison_animation.gif)
+
+![Alt Text](Best_Disatnce_over_iterations.gif)
+
+
 The project includes:
 - Python implementations of all algorithms, using a consistent distance calculation based on city coordinates.
 - Visualization of routes and convergence using Matplotlib and Folium.

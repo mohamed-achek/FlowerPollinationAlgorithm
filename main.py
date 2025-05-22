@@ -39,6 +39,7 @@ class ComparisonVisualization:
             ax.set_aspect('equal')
             ax.legend(loc='upper right', fontsize=9)
 
+
         # Update SA plot
         if frame < self.sa_frames:
             perm = self.sa.history[frame]
